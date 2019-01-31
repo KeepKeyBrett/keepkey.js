@@ -298,6 +298,7 @@ export default class KeepKey {
 
   // GetFeatures returns the features and other device information such as the version, label, and supported coins
   public async getFeatures (): Promise<Messages.Features.AsObject> {
+    console.log('we gettin features')
     const features = new Messages.GetFeatures()
     const [_, response] = await this.device.exchange(Messages.MessageType.MESSAGETYPE_GETFEATURES, features)
     return (response as Messages.Features).toObject()
@@ -414,6 +415,18 @@ export default class KeepKey {
     ping.setPinProtection(p.pinProtection || false)
     ping.setPassphraseProtection(p.passphraseProtection || false)
     const [_, response] = await this.device.exchange(Messages.MessageType.MESSAGETYPE_PING, ping)
+    const { message } = (response as Messages.Success).toObject()
+    return message
+  }
+
+  public async firmwareUpload (f: Messages.FirmwareUpload.AsObject): Promise<string> {
+    console.log('we uploadin firmware')
+    const msg = new Messages.FirmwareUpload()
+    msg.setPayloadHash(f.payloadHash)
+    msg.setPayload(f.payload)
+    console.log('invoking exchange')
+    const [_, response] = await this.device.exchange(Messages.MessageType.MESSAGETYPE_FIRMWAREUPLOAD, msg)
+    console.log({ response })
     const { message } = (response as Messages.Success).toObject()
     return message
   }
